@@ -11,7 +11,6 @@ const CHECK_INTERVAL_MINUTES = 2;
 const saveCookiesToLocalStorage = (cookies) => {
     let xRequestId = null;
     let userId = null;
-    let csrfToken = null;
 
     cookies.forEach(cookie => {
         if (cookie.name === 'MMAUTHTOKEN') {
@@ -20,17 +19,14 @@ const saveCookiesToLocalStorage = (cookies) => {
         if (cookie.name === 'MMUSERID') {
             userId = cookie.value;
         }
-        if (cookie.name === 'MMCSRF') {
-            csrfToken = cookie.value;
-        }
     });
 
-    if (xRequestId && userId && csrfToken) {
-        chrome.storage.local.set({ xRequestId, userId, csrfToken }, () => {
-            console.log('Captured data saved:', { xRequestId, userId, csrfToken });
+    if (xRequestId && userId) {
+        chrome.storage.local.set({ xRequestId, userId }, () => {
+            console.log('Captured data saved:', { xRequestId, userId });
         });
     } else {
-        console.error('Missing data to save:', { xRequestId, userId, csrfToken });
+        console.error('Missing data to save:', { xRequestId, userId});
     }
 };
 
@@ -83,12 +79,11 @@ chrome.alarms.create("checkStatus", { periodInMinutes: CHECK_INTERVAL_MINUTES })
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name === "checkStatus") {
-        const { mattermostDomain, xRequestId, userId, csrfToken } = await chrome.storage.local.get(["mattermostDomain", "xRequestId", "userId", "csrfToken"]);
-        if (mattermostDomain && xRequestId && userId && csrfToken) {
+        const { mattermostDomain, xRequestId, userId } = await chrome.storage.local.get(["mattermostDomain", "xRequestId", "userId"]);
+        if (mattermostDomain && xRequestId && userId) {
             const headers = {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-Token": csrfToken,
                 "X-Request-Id": xRequestId
             };
 
@@ -98,7 +93,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
                 await updateStatus(statusUrl, headers, { "user_id": userId, "status": "online" });
             }
         } else {
-            console.error('Missing data on alarm:', { mattermostDomain, xRequestId, userId, csrfToken });
+            console.error('Missing data on alarm:', { mattermostDomain, xRequestId, userId});
         }
     }
 });

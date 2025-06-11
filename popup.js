@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const updateUI = () => {
-    chrome.storage.local.get(["mattermostDomain", "userId", "xRequestId", "csrfToken"], (data) => {
+    chrome.storage.local.get(["mattermostDomain", "userId", "xRequestId"], (data) => {
         if (data.mattermostDomain && data.userId) {
             document.getElementById('scanResult').innerHTML = `<p>Data successfully stored!</p>`;
         }
@@ -29,7 +29,7 @@ async function scanMattermost() {
     chrome.cookies.getAll({ domain: mattermostDomain }, (cookies) => {
         let userId = null;
         let xRequestId = null;
-        let csrfToken = null;
+        
 
         cookies.forEach(cookie => {
             if (cookie.name === 'MMAUTHTOKEN') {
@@ -38,18 +38,15 @@ async function scanMattermost() {
             if (cookie.name === 'MMUSERID') {
                 userId = cookie.value;
             }
-            if (cookie.name === 'MMCSRF') {
-                csrfToken = cookie.value;
-            }
         });
 
-        if (userId && xRequestId && csrfToken) {
-            chrome.storage.local.set({ mattermostDomain, userId, xRequestId, csrfToken }, () => {
+        if (userId && xRequestId) {
+            chrome.storage.local.set({ mattermostDomain, userId, xRequestId}, () => {
                 updateUI();
                 alert('Data automatically fetched and saved.');
             });
         } else {
-            alert('Could not fetch user ID, Auth Token, or CSRF Token.');
+            alert('Could not fetch user ID, Auth Token');
         }
     });
 }
@@ -71,15 +68,14 @@ function toggleAutoStatus(event) {
 
 
 function updateStatus() {
-    chrome.storage.local.get(["mattermostDomain", "xRequestId", "userId", "csrfToken"], (data) => {
+    chrome.storage.local.get(["mattermostDomain", "xRequestId", "userId"], (data) => {
         console.log("Running updateStatus with data:", data);
-        if (data.mattermostDomain && data.xRequestId && data.userId && data.csrfToken) {
+        if (data.mattermostDomain && data.xRequestId && data.userId) {
             fetch(`https://${data.mattermostDomain}/api/v4/users/${data.userId}/status`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-Token": data.csrfToken,
                     "X-Request-Id": data.xRequestId
                 },
                 body: JSON.stringify({
@@ -117,7 +113,7 @@ document.getElementById('viewDataButton').addEventListener('click', () => {
 });
 
 const viewStoredData = () => {
-    chrome.storage.local.get(["mattermostDomain", "userId", "xRequestId", "csrfToken"], (data) => {
+    chrome.storage.local.get(["mattermostDomain", "userId", "xRequestId"], (data) => {
         if (data.mattermostDomain && data.userId) {
             document.getElementById('scanResult').innerHTML = `
                 <strong>Stored Data:</strong><br>
@@ -127,14 +123,11 @@ const viewStoredData = () => {
                 <button class="copy-button" id="copyUserId">${data.userId}</button><br>
                 <span>xRequestId</span><br>
                 <button class="copy-button" id="copyXRequestId">${data.xRequestId}</button><br>
-                <span>CSRF Token</span><br>
-                <button class="copy-button" id="copyCsrfToken">${data.csrfToken}</button><br>
             `;
 
             document.getElementById('copyDomain').addEventListener('click', () => copyToClipboard(data.mattermostDomain));
             document.getElementById('copyUserId').addEventListener('click', () => copyToClipboard(data.userId));
             document.getElementById('copyXRequestId').addEventListener('click', () => copyToClipboard(data.xRequestId));
-            document.getElementById('copyCsrfToken').addEventListener('click', () => copyToClipboard(data.csrfToken));
         }
     });
 }
