@@ -16,16 +16,57 @@ body {
 }
 
 h2 {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     font-size: 18px;
     text-align: center;
+    color: #e0e0e0;
+}
+
+.status-message {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.status-success {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+    border: 1px solid #4caf50;
+}
+
+.status-warning {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #ffb74d;
+    border: 1px solid #ff9800;
+}
+
+.status-error {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #e57373;
+    border: 1px solid #f44336;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.toggle-label {
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 30px;
     color: #e0e0e0;
 }
 
 .switch {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
 }
 
 .switch input {
@@ -66,7 +107,6 @@ input:checked + .slider:before {
 
 .slider:hover {
   background-color: #7bc1fe;
-  transform: scale(1.45);
 }
 
 button {
@@ -84,7 +124,7 @@ button {
 
 button:hover {
     background-color: #1565c0;
-    transform: scale(1.15);
+    transform: scale(1.02);
 }
 
 button:active {
@@ -97,6 +137,7 @@ button:active {
     text-align: center;
     font-size: 12px;
     color: #b0bec5;
+    width: 100%;
 }
 
 .copy-button {

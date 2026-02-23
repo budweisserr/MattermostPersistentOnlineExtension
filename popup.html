@@ -6,12 +6,16 @@
 </head>
 <body>
   <h2>Mattermost Persistent Online Status</h2>
-  <span>Toggle Online Status</span><br>
-  <label class="switch">
-    <input type="checkbox" id="autoStatusSwitch">
-    <span class="slider round"></span>
-  </label>
-  <button id="scanButton">Scan first</button>
+  <div id="statusMessage" class="status-message">Loading...</div>
+  <div class="toggle-container">
+    <span>Toggle Online Status</span>
+    <label class="switch">
+      <input type="checkbox" id="autoStatusSwitch">
+      <span class="slider round"></span>
+    </label>
+    <span id="toggleLabel" class="toggle-label">OFF</span>
+  </div>
+  <button id="scanButton">Connect to Mattermost</button>
   <button id="viewDataButton">View Stored Data</button>
   <div id="scanResult" style="display: none;"></div>
   <script src="popup.js"></script>
