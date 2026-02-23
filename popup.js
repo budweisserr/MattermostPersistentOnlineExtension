@@ -17,15 +17,27 @@ const updateUI = () => {
     chrome.storage.session.get(["mattermostDomain", "userId"], (data) => {
         const statusEl = document.getElementById('statusMessage');
         const connectBtn = document.getElementById('scanButton');
+        const scanResult = document.getElementById('scanResult');
         
         if (data.mattermostDomain && data.userId) {
             statusEl.textContent = 'Connected to ' + data.mattermostDomain;
             statusEl.className = 'status-success';
             connectBtn.textContent = 'Reconnect';
+            scanResult.innerHTML = `
+                <div class="data-row">
+                    <span class="data-label">Domain:</span>
+                    <span class="data-value">${escapeHtml(data.mattermostDomain)}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">User ID:</span>
+                    <span class="data-value">${escapeHtml(data.userId.substring(0, 12))}...</span>
+                </div>
+            `;
         } else {
             statusEl.textContent = 'Not connected';
             statusEl.className = 'status-warning';
             connectBtn.textContent = 'Connect to Mattermost';
+            scanResult.innerHTML = '<p class="no-data">Not connected</p>';
         }
     });
 }
@@ -136,46 +148,8 @@ function updateStatus() {
     });
 }
 
-document.getElementById('viewDataButton').addEventListener('click', () => {
-    const scanResult = document.getElementById('scanResult');
-    if (scanResult.style.display === 'none' || scanResult.style.display === '') {
-      viewStoredData();
-      scanResult.style.display = 'block';
-      document.body.style.height = 'auto';
-    } else {
-      scanResult.style.display = 'none';
-      document.body.style.height = '300px';
-    }
-});
-
-const viewStoredData = () => {
-    chrome.storage.session.get(["mattermostDomain", "userId", "xRequestId"], (data) => {
-        if (data.mattermostDomain && data.userId) {
-            const maskedXRequestId = data.xRequestId ? data.xRequestId.substring(0, 8) + '...' : 'Not set';
-            
-            document.getElementById('scanResult').innerHTML = `
-                <strong>Stored Data:</strong><br>
-                <span>Domain</span><br>
-                <button class="copy-button" id="copyDomain">${escapeHtml(data.mattermostDomain)}</button><br>
-                <span>User ID</span><br>
-                <button class="copy-button" id="copyUserId">${escapeHtml(data.userId.substring(0, 8))}...</button><br>
-            `;
-        } else {
-            document.getElementById('scanResult').innerHTML = '<p>No data stored</p>';
-        }
-    });
-}
-
 const escapeHtml = (text) => {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-};
-
-const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-        showMessage('Copied to clipboard');
-    }).catch(err => {
-        showMessage('Failed to copy', true);
-    });
 };
