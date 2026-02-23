@@ -1,5 +1,9 @@
 # Mattermost Persistent Online Status
 
+Fork of the original extension by [Nightyonlyy](https://github.com/Nightyonlyy/MattermostPersistentOnlineExtension). This version adds Firefox support.
+
+The original extension is available for Chrome at the link above.
+
 This extension was developed to permanently display users as online in Mattermost. It prevents you from appearing as absent or inactive due to inactivity. The extension ensures that you are always shown as active, even if you are not actively using your computer. This is particularly useful in professional environments where it is important to be continuously available.
 
 ## Download
