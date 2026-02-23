@@ -14,8 +14,7 @@
         "storage",
         "cookies",
         "alarms",
-        "webRequest",
-        "webRequestBlocking"
+        "webRequest"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -27,7 +26,6 @@
         }
     },
     "background": {
-        "scripts": ["background.js"],
-        "persistent": false
+        "scripts": ["background.js"]
     }
 }
