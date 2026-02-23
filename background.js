@@ -4,11 +4,10 @@ PERSISTENT MATTERMOST ONLINE STATUS
 CREATED BY @Nightyonlyy
 */
 
-// Check every 2 minutes [DEFAULT MATTERMOST INACTIVITY TIMEOUT IS 5 min]
 const CHECK_INTERVAL_MINUTES = 2;
+const IDLE_THRESHOLD_SECONDS = 60;
 
-// Helper function to get cookies and save to local storage
-const saveCookiesToLocalStorage = (cookies) => {
+const saveCookiesToLocalStorage = (cookies, domain) => {
     let xRequestId = null;
     let userId = null;
 
@@ -22,32 +21,35 @@ const saveCookiesToLocalStorage = (cookies) => {
     });
 
     if (xRequestId && userId) {
-        chrome.storage.local.set({ xRequestId, userId }, () => {
-            console.log('Captured data saved:', { xRequestId, userId });
+        chrome.storage.session.set({ xRequestId, userId, mattermostDomain: domain }, () => {
+            console.log('Captured data saved to session storage:', { userId });
         });
     } else {
-        console.error('Missing data to save:', { xRequestId, userId});
+        console.error('Missing data to save:', { xRequestId, userId });
     }
 };
 
-// Grabs the current data from a request to save it in the local storage
 chrome.webRequest.onBeforeSendHeaders.addListener(
     function(details) {
-        if (details.url.includes('/api/v4/channels/members/me/view') && details.method === 'POST') {
-            chrome.cookies.getAll({ domain: new URL(details.url).hostname }, saveCookiesToLocalStorage);
+        if (details.url.includes('/api/v4/users/') && details.requestHeaders) {
+            const authHeader = details.requestHeaders.find(h => h.name === 'X-Request-Id');
+            if (authHeader) {
+                const domain = new URL(details.url).hostname;
+                chrome.cookies.getAll({ domain: domain }, (cookies) => {
+                    if (cookies && cookies.length > 0) {
+                        saveCookiesToLocalStorage(cookies, domain);
+                    }
+                });
+            }
         }
     },
     { urls: ["<all_urls>"], types: ["xmlhttprequest"] },
-    ["requestHeaders", "extraHeaders"]
+    ["requestHeaders", "blocking"]
 );
 
-// Helper function to fetch the status
 const fetchStatus = async (url, headers) => {
     try {
-        console.log("Fetching status with URL:", url);
-        console.log("Using headers:", headers);
-        
-        const response = await fetch(url, { method: "GET", headers, credentials: 'include' });
+        const response = await fetch(url, { method: "GET", headers, credentials: 'same-origin' });
         if (!response.ok) throw new Error(response.statusText);
         
         const contentType = response.headers.get("content-type");
@@ -63,23 +65,29 @@ const fetchStatus = async (url, headers) => {
     }
 };
 
-// Helper function to update the status
 const updateStatus = async (url, headers, body) => {
     try {
-        const response = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body), credentials: 'include' });
+        const response = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body), credentials: 'same-origin' });
         if (!response.ok) throw new Error(response.statusText);
         console.log("Status successfully updated to 'online'");
+        return true;
     } catch (error) {
         console.error("Error updating status:", error);
+        return false;
     }
 };
 
-// Creates an alarm which checks if you're still online or away
-chrome.alarms.create("checkStatus", { periodInMinutes: CHECK_INTERVAL_MINUTES });
+const checkStatusAlarm = async () => {
+    try {
+        const state = await chrome.idle.queryState(IDLE_THRESHOLD_SECONDS);
+        if (state !== 'active') {
+            console.log('User is idle, skipping status check');
+            return;
+        }
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-    if (alarm.name === "checkStatus") {
-        const { mattermostDomain, xRequestId, userId } = await chrome.storage.local.get(["mattermostDomain", "xRequestId", "userId"]);
+        const storage = await chrome.storage.session.get(["mattermostDomain", "xRequestId", "userId"]);
+        const { mattermostDomain, xRequestId, userId } = storage;
+        
         if (mattermostDomain && xRequestId && userId) {
             const headers = {
                 "Content-Type": "application/json",
@@ -92,8 +100,31 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
             if (status === "away") {
                 await updateStatus(statusUrl, headers, { "user_id": userId, "status": "online" });
             }
-        } else {
-            console.error('Missing data on alarm:', { mattermostDomain, xRequestId, userId});
         }
+    } catch (error) {
+        console.error('Error in checkStatusAlarm:', error);
+    }
+};
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === "checkStatus") {
+        checkStatusAlarm();
+    }
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.alarms.create("checkStatus", { periodInMinutes: CHECK_INTERVAL_MINUTES });
+});
+
+chrome.alarms.get("checkStatus", (alarm) => {
+    if (!alarm) {
+        chrome.alarms.create("checkStatus", { periodInMinutes: CHECK_INTERVAL_MINUTES });
+    }
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "updateStatus") {
+        checkStatusAlarm().then(() => sendResponse({ success: true })).catch(e => sendResponse({ success: false, error: e.message }));
+        return true;
     }
 });
