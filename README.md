@@ -8,7 +8,7 @@ This extension was developed to permanently display users as online in Mattermos
 
 ## Download
 
-- Add-ons**: **Mozilla [https://addons.mozilla.org/en-US/firefox/addon/mattermost-online-status/](https://addons.mozilla.org/en-US/firefox/addon/mattermost-online-status/)
+- **Add-ons**: [Mozilla](https://addons.mozilla.org/en-US/firefox/addon/mattermost-online-status/)
 
 ## Installation
 
