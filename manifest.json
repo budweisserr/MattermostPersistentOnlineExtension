@@ -2,10 +2,11 @@
     "manifest_version": 3,
     "name": "Mattermost Online Status",
     "version": "2025.1.0",
+    "description": "Keeps your Mattermost status online permanently",
     "action": {
         "default_icon": {
             "128": "icons/favicon.png"
-          },
+        },
         "default_popup": "popup.html",
         "default_title": "Mattermost Online Status"
     },
@@ -25,15 +26,6 @@
             "strict_min_version": "109.0"
         }
     },
-    "data_collection_permissions": [
-        {
-            "id": "session-storage",
-            "human_description": {
-                "string": "Stores Mattermost authentication tokens temporarily to keep your status online"
-            },
-            "type": "explicit"
-        }
-    ],
     "background": {
         "scripts": ["background.js"]
     }
