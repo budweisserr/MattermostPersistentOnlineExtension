@@ -14,12 +14,21 @@
         "storage",
         "cookies",
         "alarms",
-        "webRequest"
+        "webRequest",
+        "webRequestBlocking",
+        "idle"
     ],
     "host_permissions": [
         "<all_urls>"
     ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "mattermost-online-status@nightyonlyy.extension",
+            "strict_min_version": "109.0"
+        }
+    },
     "background": {
-        "service_worker": "background.js"
+        "scripts": ["background.js"],
+        "persistent": false
     }
 }

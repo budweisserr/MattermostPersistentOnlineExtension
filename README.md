@@ -7,9 +7,9 @@ You can also download it easily via the Chrome Web Store.
 This extension was developed to permanently display users as online in Mattermost. It prevents you from appearing as absent or inactive due to inactivity. The extension ensures that you are always shown as active, even if you are not actively using your computer. This is particularly useful in professional environments where it is important to be continuously available.
 
 ## Installation
-### INFO it just works on chrome-based browsers for now!
+### INFO it works on Chrome-based browsers and Firefox!
 
-### Chrome
+### Chrome / Chromium (Brave, Edge, etc.)
 1. Download the latest version of the extension from Github:
    [Download](add link)
 
@@ -21,18 +21,21 @@ chrome://extensions
 
 4. Click on “Load unpacked” and select the downloaded ZIP file.
 ___
-### Brave
+### Firefox
+
 1. Download the latest version of the extension from Github:
    [Download](add link)
 
-2. Open the extension page in Brave:
+2. Open the extension page in Firefox:
 ```
-brave://extension
+about:debugging#/runtime/this-firefox
 ```
-3. Activate the developer mode.
 
-4. Click on “Load unpacked” and select the downloaded ZIP file.
+3. Click on "Load Temporary Add-on..."
 
+4. Select the `manifest.json` file from the extension folder.
+
+**Note:** Firefox requires the extension to be loaded as a temporary add-on. For permanent installation, you would need to sign the extension through Mozilla (see [Firefox Extension Publishing](https://extensionworkshop.com/documentation/publish/publish-an-extension/)).
 
 ## Congratulations
 
