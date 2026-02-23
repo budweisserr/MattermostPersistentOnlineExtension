@@ -25,6 +25,15 @@
             "strict_min_version": "109.0"
         }
     },
+    "data_collection_permissions": [
+        {
+            "id": "session-storage",
+            "human_description": {
+                "string": "Stores Mattermost authentication tokens temporarily to keep your status online"
+            },
+            "type": "explicit"
+        }
+    ],
     "background": {
         "scripts": ["background.js"]
     }
