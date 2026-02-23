@@ -15,8 +15,7 @@
         "cookies",
         "alarms",
         "webRequest",
-        "webRequestBlocking",
-        "idle"
+        "webRequestBlocking"
     ],
     "host_permissions": [
         "<all_urls>"

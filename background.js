@@ -5,7 +5,6 @@ CREATED BY @Nightyonlyy
 */
 
 const CHECK_INTERVAL_MINUTES = 2;
-const IDLE_THRESHOLD_SECONDS = 60;
 
 const saveCookiesToLocalStorage = (cookies, domain) => {
     let xRequestId = null;
@@ -79,12 +78,6 @@ const updateStatus = async (url, headers, body) => {
 
 const checkStatusAlarm = async () => {
     try {
-        const state = await chrome.idle.queryState(IDLE_THRESHOLD_SECONDS);
-        if (state !== 'active') {
-            console.log('User is idle, skipping status check');
-            return;
-        }
-
         const storage = await chrome.storage.session.get(["mattermostDomain", "xRequestId", "userId"]);
         const { mattermostDomain, xRequestId, userId } = storage;
         
